@@ -1,12 +1,7 @@
 const express = require('express');
-const Joi = require('joi');
 const contacts = require('../../models/contacts');
-
-const schema = Joi.object({
-  name: Joi.string().min(3).required(),
-  email: Joi.string().min(6).required(),
-  phone: Joi.number().min(6).required(),
-});
+const { postSchema, putSchema } = require('../../schemas/contact-schema');
+const HttpError = require('../../helpers/httpError');
 
 const router = express.Router();
 
@@ -24,9 +19,7 @@ router.get('/:id', async (req, res, next) => {
     const { id } = req.params;
     const result = await contacts.getContactById(id);
     if (!result) {
-      const err = new Error('Not faund');
-      err.status = 404;
-      throw err;
+      throw HttpError(404, 'Not faund');
     }
     res.json(result);
   } catch (err) {
@@ -36,12 +29,10 @@ router.get('/:id', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
-    const { error } = schema.validate(req.body);
+    const { error } = postSchema.validate(req.body);
     console.log(error);
     if (error) {
-      error.status = 400;
-      error.message = 'missing required name field';
-      throw error;
+      throw HttpError(400, error.message);
     }
     const result = await contacts.addContact(req.body);
     res.status(201).json(result);
@@ -55,11 +46,9 @@ router.delete('/:id', async (req, res, next) => {
     const { id } = req.params;
     const result = await contacts.removeContact(id);
     if (!result) {
-      const err = new Error('Not faund');
-      err.status = 404;
-      throw err;
+      throw HttpError(404, 'Not faund');
     }
-    res.json('contact deleted');
+    res.json({ message: 'contact deleted' });
   } catch (err) {
     next(err);
   }
@@ -67,19 +56,14 @@ router.delete('/:id', async (req, res, next) => {
 
 router.put('/:id', async (req, res, next) => {
   try {
-    const { error } = schema.validate(req.body);
-    console.log(error);
+    const { error } = putSchema.validate(req.body);
     if (error) {
-      error.status = 400;
-      error.message = 'missing required name field';
-      throw error;
+      throw HttpError(400, 'missing fields');
     }
     const { id } = req.params;
     const result = await contacts.updateContact(id, req.body);
     if (!result) {
-      const err = new Error('missing fields');
-      err.status = 400;
-      throw err;
+      throw HttpError(404, 'Not found');
     }
     res.json(result);
   } catch (err) {
