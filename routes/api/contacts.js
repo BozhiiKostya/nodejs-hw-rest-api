@@ -57,13 +57,17 @@ router.delete('/:id', async (req, res, next) => {
 router.put('/:id', async (req, res, next) => {
   try {
     const { error } = putSchema.validate(req.body);
+
     if (error) {
-      throw HttpError(400, 'missing fields');
+      throw HttpError(400, error.message);
     }
     const { id } = req.params;
+
+    console.log(id);
     const result = await contacts.updateContact(id, req.body);
+
     if (!result) {
-      throw HttpError(404, 'Not found');
+      return next(HttpError(404, 'Not found'));
     }
     res.json(result);
   } catch (err) {

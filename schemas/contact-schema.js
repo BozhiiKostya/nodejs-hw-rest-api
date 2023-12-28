@@ -25,7 +25,12 @@ const putSchema = Joi.object({
   phone: Joi.string()
     .min(6)
     .pattern(/^[0-9\s()+-]+$/),
-}).or('name', 'email', 'phone');
+})
+  .or('name', 'email', 'phone')
+  .required()
+  .messages({
+    'object.missing': 'missing fields',
+  });
 
 module.exports = {
   postSchema,
