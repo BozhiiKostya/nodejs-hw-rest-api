@@ -19,7 +19,7 @@ router.get('/:id', async (req, res, next) => {
     const { id } = req.params;
     const result = await contacts.getContactById(id);
     if (!result) {
-      throw HttpError(404, 'Not faund');
+      throw HttpError(404, 'Not found');
     }
     res.json(result);
   } catch (err) {
@@ -46,7 +46,7 @@ router.delete('/:id', async (req, res, next) => {
     const { id } = req.params;
     const result = await contacts.removeContact(id);
     if (!result) {
-      throw HttpError(404, 'Not faund');
+      throw HttpError(404, 'Not found');
     }
     res.json({ message: 'contact deleted' });
   } catch (err) {
