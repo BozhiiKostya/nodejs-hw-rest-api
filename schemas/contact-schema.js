@@ -17,6 +17,7 @@ const postSchema = Joi.object({
       'string.min': 'Phone number must be at least 6 characters long',
       'string.pattern.base': 'Invalid phone number format',
     }),
+  favorite: Joi.boolean(),
 });
 
 const putSchema = Joi.object({
@@ -25,8 +26,18 @@ const putSchema = Joi.object({
   phone: Joi.string()
     .min(6)
     .pattern(/^[0-9\s()+-]+$/),
+  favorite: Joi.boolean(),
 })
-  .or('name', 'email', 'phone')
+  .or('name', 'email', 'phone', 'favorite')
+  .required()
+  .messages({
+    'object.missing': 'missing fields',
+  });
+
+const patchSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+})
+  .or('name', 'email', 'phone', 'favorite')
   .required()
   .messages({
     'object.missing': 'missing fields',
@@ -35,4 +46,5 @@ const putSchema = Joi.object({
 module.exports = {
   postSchema,
   putSchema,
+  patchSchema,
 };
