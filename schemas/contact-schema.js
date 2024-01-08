@@ -35,14 +35,10 @@ const putSchema = Joi.object({
   });
 
 const patchSchema = Joi.object({
-  favorite: Joi.boolean().required(),
-})
-  .or('name', 'email', 'phone', 'favorite')
-  .required()
-  .messages({
-    'object.missing': 'missing fields',
-  });
-
+  favorite: Joi.boolean().required().messages({
+    'any.required': 'missing field favorite',
+  }),
+});
 module.exports = {
   postSchema,
   putSchema,

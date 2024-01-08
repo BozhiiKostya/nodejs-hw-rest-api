@@ -1,5 +1,9 @@
 const Contact = require('../models/contact');
-const { postSchema, putSchema } = require('../schemas/contact-schema');
+const {
+  postSchema,
+  putSchema,
+  patchSchema,
+} = require('../schemas/contact-schema');
 const { ctrlWrapper, HttpError } = require('../helpers/index');
 
 const listContacts = async (req, res) => {
@@ -40,11 +44,11 @@ const updateContact = async (req, res) => {
 };
 
 const updateFavorite = async (req, res) => {
-  const { error } = putSchema.validate(req.body);
+  const { error } = patchSchema.validate(req.body);
   const { id } = req.params;
 
   if (error) {
-    throw HttpError(400, (error.message = 'missing field favorite'));
+    throw HttpError(400, error.message);
   }
   const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
   if (!result) {
