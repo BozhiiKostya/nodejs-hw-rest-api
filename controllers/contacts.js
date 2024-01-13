@@ -7,7 +7,13 @@ const {
 const { ctrlWrapper, HttpError } = require('../helpers/index');
 
 const listContacts = async (req, res) => {
-  const result = await Contact.find({}, '-createdAt -updatedAt');
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, '-createdAt -updatedAt', {
+    skip,
+    limit,
+  }).populate('owner', 'email');
   res.json(result);
 };
 
@@ -21,11 +27,12 @@ const getContactById = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
+  const { _id: owner } = req.user;
   const { error } = postSchema.validate(req.body);
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await Contact.create(req.body);
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 

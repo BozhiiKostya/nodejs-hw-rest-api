@@ -16,12 +16,17 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+    },
   },
+
   { versionKey: false, timestamps: true }
 );
 
 contactSchema.post('save', (err, data, next) => {
-  console.log(err);
+  err.status = 400;
   next();
 });
 
