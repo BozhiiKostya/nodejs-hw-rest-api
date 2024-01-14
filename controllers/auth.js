@@ -5,7 +5,7 @@ require('dotenv').config();
 const { SECRET_KEY } = process.env;
 
 const { ctrlWrapper, HttpError } = require('../helpers/index');
-const { registerSchema } = require('../schemas/auth-schema');
+const { registerSchema, loginSchema } = require('../schemas/auth-schema');
 
 const register = async (req, res) => {
   const { error } = registerSchema.validate(req.body);
@@ -30,6 +30,11 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
+  const { error } = loginSchema.validate(req.body);
+
+  if (error) {
+    throw HttpError(400, error.message);
+  }
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
