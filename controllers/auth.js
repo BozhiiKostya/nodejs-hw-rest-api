@@ -107,11 +107,11 @@ const updateAvatar = async (req, res) => {
 
   await fs.rename(tmpUpload, resultDirUpload);
 
-  const avatarUrl = path.join('avatars', newOriginalname);
+  const avatarURL = path.join('avatars', newOriginalname);
 
-  await User.findByIdAndUpdate(_id, { avatarUrl });
+  await User.findByIdAndUpdate(_id, { avatarURL });
 
-  res.json({ avatarUrl });
+  res.status(200).json({ avatarURL });
 };
 
 module.exports = {
