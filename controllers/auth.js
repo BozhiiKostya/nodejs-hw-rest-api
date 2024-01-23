@@ -1,8 +1,14 @@
+const path = require('path');
+const fs = require('fs/promises');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Jimp = require('jimp');
+const gravatar = require('gravatar');
 const User = require('../models/user');
 require('dotenv').config();
+
 const { SECRET_KEY } = process.env;
+const avatarsDir = path.join(__dirname, '../', 'public', 'avatars');
 
 const { ctrlWrapper, HttpError } = require('../helpers/index');
 const { registerSchema, loginSchema } = require('../schemas/auth-schema');
@@ -19,8 +25,13 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
   res.status(201).json({
     user: {
       email: newUser.email,
@@ -77,9 +88,36 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 
+const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, 'Not found photo');
+  }
+  const { _id } = req.user;
+  const { path: tmpUpload, originalname } = req.file;
+  const newOriginalname = `${_id}_${originalname}`;
+  const resultDirUpload = path.join(avatarsDir, newOriginalname);
+
+  Jimp.read(tmpUpload)
+    .then((avatar) => {
+      return avatar.resize(250, 250).write(resultDirUpload);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+
+  await fs.rename(tmpUpload, resultDirUpload);
+
+  const avatarURL = path.join('avatars', newOriginalname);
+
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.status(200).json({ avatarURL });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
