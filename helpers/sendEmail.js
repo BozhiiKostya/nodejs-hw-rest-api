@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const { EMAIL_PASS_FROM, EMAIL_PASS2 } = process.env;
+const { EMAIL_PASS_FROM } = process.env;
 
 // const nodemailerConfig = {
 //   host: 'smtp.meta.ua',
@@ -18,7 +18,7 @@ const nodemailerConfig = {
   secure: false,
   auth: {
     user: 'kostyazap1@outlook.com',
-    pass: EMAIL_PASS2,
+    pass: EMAIL_PASS_FROM,
   },
 };
 
