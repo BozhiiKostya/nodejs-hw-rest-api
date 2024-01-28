@@ -98,8 +98,8 @@ const resendVerifyEmail = async (req, res) => {
 
   await sendEmail(verifyEmail);
 
-  res.json({
-    email,
+  res.status(200).json({
+    message: 'Verification email sent',
   });
 };
 
